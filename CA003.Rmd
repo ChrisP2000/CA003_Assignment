@@ -29,17 +29,17 @@ metropolis <- function(N, initial_x, s) {
   # Run the Metropolis-Hastings algorithm
   for (i in 2:N) {
     # Propose a new sample from the Normal distribution
-    x_star <- rnorm(1, mean = x[i - 1], sd = s)
+    randomXStar <- rnorm(1, mean = x[i - 1], sd = s)
     
     # Compute the acceptance ratio
-    ratio <- f(x_star) / f(x[i - 1])
+    ratio <- f(randomXStar) / f(x[i - 1])
     
     # Generate a random number from the uniform distribution
     u <- log(runif(1))
     
     # Update the sample based on the log acceptance ratio
     if (u < log(ratio)) {
-      x[i] <- x_star
+      x[i] <- randomXStar
     } else {
       x[i] <- x[i - 1]
     }
@@ -47,13 +47,38 @@ metropolis <- function(N, initial_x, s) {
   
   return(x)
 }
+
+
+set.seed(123)
+
+# Parameters
+N <- 10000  # Number of iterations
+initial_x <- 0  # Initial value
+s <- 1  # Standard deviation for the proposal distribution
+
+# Run the Metropolis-Hastings algorithm
+generated_samples <- metropolis(N, initial_x, s)
+
+# Plot histogram and kernel density plot
+hist(generated_samples, breaks = 30, prob = TRUE, col = "skyblue", main = "Metropolis-Hastings Samples", xlab = "x")
+lines(density(generated_samples), col = "purple", lwd = 2)
+
+# Overlay true distribution
+curve(f(x), add = TRUE, col = "red", lwd = 2)
+
+# Report sample mean and standard deviation
+mean_generated <- mean(generated_samples)
+sd_generated <- sd(generated_samples)
+
+cat("Sample Mean:", mean_generated, "\n")
+cat("Sample Standard Deviation:", sd_generated, "\n")
 ```
 
 ## Including Plots
 
 You can also embed plots, for example:
 
-```{r pressure, echo=FALSE}
+```{For Q1b}
 plot(pressure)
 ```
 
