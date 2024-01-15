@@ -1,0 +1,60 @@
+---
+title: "Untitled"
+author: "Chris_Pang"
+date: "2024-01-12"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r distribution probasbility function}
+
+f <- function(x) {
+  return(12 * exp(-abs(x)))
+}
+
+metropolis <- function(N, initial_x, s) {
+  # Initialize variables
+  x <- numeric(N)
+  x[1] <- initial_x
+  
+  # Run the Metropolis-Hastings algorithm
+  for (i in 2:N) {
+    # Propose a new sample from the Normal distribution
+    x_star <- rnorm(1, mean = x[i - 1], sd = s)
+    
+    # Compute the acceptance ratio
+    ratio <- f(x_star) / f(x[i - 1])
+    
+    # Generate a random number from the uniform distribution
+    u <- log(runif(1))
+    
+    # Update the sample based on the log acceptance ratio
+    if (u < log(ratio)) {
+      x[i] <- x_star
+    } else {
+      x[i] <- x[i - 1]
+    }
+  }
+  
+  return(x)
+}
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
