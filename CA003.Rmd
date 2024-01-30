@@ -80,8 +80,66 @@ cat("Sample Standard Deviation:", sd_generated, "\n")
 
 You can also embed plots, for example:
 
-```{For Q1b}
-plot(pressure)
+```{r distribution}
+# Function to run Metropolis-Hastings algorithm for a single chain
+metropolis_chain <- function(N, initial_x, s) {
+  x <- numeric(N)
+  x[1] <- initial_x
+  
+  for (i in 2:N) {
+    randomXStar <- rnorm(1, mean = x[i - 1], sd = s)
+    ratio <- f(randomXStar) / f(x[i - 1])
+    u <- runif(1)
+    
+    if (u < ratio) {
+      x[i] <- randomXStar
+    } else {
+      x[i] <- x[i - 1]
+    }
+  }
+  
+  return(x)
+}
+t/
+# Function to calculate Rb value
+calculate_Rb <- function(chains) {
+  J <- length(chains)
+  N <- length(chains[[1]])
+  
+  Mj <- sapply(chains, function(chain) mean(chain))
+  Vj <- sapply(chains, function(chain) var((chain - mean(chain))^2))
+  
+  W <- sum(Vj) / J
+  M <- mean(Mj)
+  B <- sum((Mj - M)^2) / J
+  
+  var_hat <- B + W
+  Rb <- sqrt(var_hat / W)
+  
+  return(Rb)
+}
+
+# Set random seed for reproducibility
+set.seed(123)
+
+# Parameters
+N <- 2000  # Number of iterations
+J <- 4  # Number of chains
+s_values <- seq(0.001, 1, length.out = 100)  # Grid of s values
+
+# Run Metropolis-Hastings for different s values and calculate Rb
+Rb_values <- numeric(length(s_values))
+
+for (i in seq_along(s_values)) {
+  chains <- replicate(J, metropolis_chain(N, initial_x = 0, s = s_values[i]), simplify = FALSE)
+  Rb_values[i] <- calculate_Rb(chains)
+}
+
+# Plot Rb values over the grid of s values
+plot.new()  # Call plot.new() to initiate a new plot
+plot(s_values, Rb_values, type='l', col='blue', lwd=2, xlab='s', ylab='Rb', main='Rb Values over a Grid of s Values')
+abline(h=1.05, col='red', lty='dashed', lw=2)  # Adding a horizontal line at y=1.05 for reference
+legend('topright', legend=c('Rb Values', 'Threshold (1.05)'), col=c('blue', 'red'), lty=1:1, cex=0.8)
 ```
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
