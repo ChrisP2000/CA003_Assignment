@@ -21,7 +21,7 @@ f <- function(x) {
 }
 
 metropolis <- function(N, initial_x, s) {
-  # Initialize variables
+  # Set up initial value 
   x <- numeric(N)
   x[1] <- initial_x
   
